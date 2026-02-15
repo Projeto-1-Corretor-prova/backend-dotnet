@@ -3,6 +3,7 @@ using backend.dtos.answer;
 using backend.dtos.correction;
 using backend.dtos.question;
 using backend.dtos.questionBank;
+using backend.dtos.questionCriteria;
 using backend.dtos.questionTestWritten;
 using backend.dtos.student;
 using backend.dtos.teacher;
@@ -48,6 +49,10 @@ public class MappingProfile : Profile
         CreateMap<QuestionCreateDto, Question>();
         CreateMap<QuestionUpdateDto, Question>();
 
+        CreateMap<QuestionCriteria, QuestionCriteriaDto>();
+        CreateMap<QuestionCriteriaCreateDto, QuestionCriteria>();
+        CreateMap<QuestionCriteriaUpdateDto, QuestionCriteria>();
+        
         CreateMap<Correction, CorrectionDto>();
         CreateMap<Correction, CorrectionMiniDto>();
         

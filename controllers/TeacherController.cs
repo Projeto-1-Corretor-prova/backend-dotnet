@@ -55,7 +55,7 @@ public class TeacherController : ControllerBase
     // }
     
     [HttpPost(Routes.TeacherLoginUrl)]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginDto loginDto)
     {
         if (!ModelState.IsValid)
         {
@@ -82,21 +82,12 @@ public class TeacherController : ControllerBase
         // Generate JWT token
         var token = _jwtService.GenerateToken(teacher);
 
-        return Ok(new
-        {
-            token,
-            teacher = new
-            {
-                id = teacher.Id,
-                name = teacher.Name,
-                email = teacher.Email
-            }
-        });
+        return Ok(new LoginResponse(teacher.Id, teacher.Name, token));
     }
 
     [HttpGet(Routes.TeacherProfileUrl)]
     [Authorize]
-    public async Task<IActionResult> GetProfile()
+    public async Task<ActionResult<TeacherDto>> GetProfile()
     {
         
         if (!this.TryGetUserIdFromToken(out int teacherId))
@@ -117,11 +108,6 @@ public class TeacherController : ControllerBase
             return NotFound(new { message = "Teacher not found" });
         }
 
-        return Ok(new
-        {
-            id = teacher.Id,
-            name = teacher.Name,
-            email = teacher.Email
-        });
+        return Ok(_mapper.Map<TeacherDto>(teacher));
     }
 }

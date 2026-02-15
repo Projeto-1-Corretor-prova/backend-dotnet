@@ -43,6 +43,7 @@ public class TeacherClassController(TeacherDbContext context, IMapper mapper) : 
             .Where(tc => tc.Id == id)
             .Include(tc => tc.Students)
             .Include(tc => tc.TestWrittens)
+            .ThenInclude(tw => tw.QuestionTestWrittens)
             .FirstOrDefaultAsync();
         if (teacherClass == null) return new NotFoundResult();
         teacherClass = mapper.Map<TeacherClassUpdateDto, TeacherClass>(teacherClassUpdateDto, teacherClass);
@@ -62,6 +63,7 @@ public class TeacherClassController(TeacherDbContext context, IMapper mapper) : 
              .Where(tc => tc.Id == id)
              .Include(tc => tc.Students)
              .Include(tc => tc.TestWrittens)
+             .ThenInclude(tw => tw.QuestionTestWrittens)
              .FirstOrDefaultAsync();
          if (teacherClass == null) return new NotFoundResult();
          return new OkObjectResult(mapper.Map<TeacherClassDto>(teacherClass));

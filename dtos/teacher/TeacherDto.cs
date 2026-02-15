@@ -5,7 +5,8 @@ namespace backend.dtos.teacher;
 
 public record TeacherDto(
     int Id,
-    string Name,
+    string Name, 
+    string Email,
     List<TeacherClassMiniDto> TeacherClasses,
     List<QuestionBankMiniDto> QuestionBanks
     );
