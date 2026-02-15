@@ -2,6 +2,7 @@ using AutoMapper;
 using backend.dtos.teacher;
 using backend.models;
 using backend.services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,31 +28,31 @@ public class TeacherController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpPost]
-    [Route(Routes.TeacherRegisterUrl)]
-    public async Task<IActionResult> Register([FromBody] TeacherCreateDto registerDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        // Check if email already exists
-        if (await _context.Teachers.AnyAsync(t => t.Email == registerDto.Email))
-        {
-            return BadRequest(new { message = "Email already in use" });
-        }
-
-        var teacher = _mapper.Map<Teacher>(registerDto);
-        
-        // Hash password
-        teacher.Password = _authService.HashPassword(registerDto.Password);
-
-        _context.Teachers.Add(teacher);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Registration successful" });
-    }
+    // [HttpPost]
+    // [Route(Routes.TeacherRegisterUrl)]
+    // public async Task<IActionResult> Register([FromBody] TeacherCreateDto registerDto)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //
+    //     // Check if email already exists
+    //     if (await _context.Teachers.AnyAsync(t => t.Email == registerDto.Email))
+    //     {
+    //         return BadRequest(new { message = "Email already in use" });
+    //     }
+    //
+    //     var teacher = _mapper.Map<Teacher>(registerDto);
+    //     
+    //     // Hash password
+    //     teacher.Password = _authService.HashPassword(registerDto.Password);
+    //
+    //     _context.Teachers.Add(teacher);
+    //     await _context.SaveChangesAsync();
+    //
+    //     return Ok(new { message = "Registration successful" });
+    // }
     
     [HttpPost(Routes.TeacherLoginUrl)]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -65,6 +66,8 @@ public class TeacherController : ControllerBase
         var teacher = await _context.Teachers
             .FirstOrDefaultAsync(t => t.Email == loginDto.Email);
 
+        Console.WriteLine("Teacher found: " + (teacher != null ? teacher.Email : "null"));
+        
         if (teacher == null)
         {
             return Unauthorized(new { message = "Invalid email or password" });
@@ -92,18 +95,22 @@ public class TeacherController : ControllerBase
     }
 
     [HttpGet(Routes.TeacherProfileUrl)]
-    [backend.attributes.Authorize]
+    [Authorize]
     public async Task<IActionResult> GetProfile()
     {
-        var teacherId = (int?)HttpContext.Items["TeacherId"];
         
-        if (teacherId == null)
+        if (!this.TryGetUserIdFromToken(out int teacherId))
         {
-            return Unauthorized(new { message = "Teacher not found in token" });
+            return Unauthorized(new { message = "Invalid token" });
         }
 
         var teacher = await _context.Teachers
-            .FirstOrDefaultAsync(t => t.Id == teacherId);
+            .AsNoTracking()
+            .AsQueryable()
+            .Where(t => t.Id == teacherId)
+            .Include(t => t.QuestionBanks)
+            .Include(t => t.TeacherClasses)
+            .FirstOrDefaultAsync();
 
         if (teacher == null)
         {

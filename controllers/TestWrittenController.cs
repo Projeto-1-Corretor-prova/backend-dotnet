@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.dtos.testWritten;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,9 @@ namespace backend.controllers;
 public class TestWrittenController(TeacherDbContext teacherDbContext, IMapper mapper): ControllerBase
 {
     
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPost(Routes.TestWrittenCreateUrl)]
-    public async Task<IActionResult> Post(
+    public async Task<ActionResult<TestWrittenDto>> Post(
         [FromRoute] int teacherClassId,
         [FromBody] TestWrittenCreateDto teacherCreateDto)
     {
@@ -25,9 +26,9 @@ public class TestWrittenController(TeacherDbContext teacherDbContext, IMapper ma
         return new OkObjectResult(mapper.Map<TestWrittenDto>(createdTestWritten));
     }
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPut(Routes.TestWrittenByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<TestWrittenDto>> Put(
         [FromRoute] int id,
         [FromBody] TestWrittenUpdateDto testWrittenUpdateDto)
     {
@@ -47,9 +48,9 @@ public class TestWrittenController(TeacherDbContext teacherDbContext, IMapper ma
         return new OkObjectResult(mapper.Map<TestWrittenDto>(updatedTestWritten));
     }
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpGet(Routes.TestWrittenByIdUrl)]
-    public async Task<IActionResult> Get(
+    public async Task<ActionResult<TestWrittenDto>> Get(
         [FromRoute] int id)
     {
         var testWritten = await teacherDbContext

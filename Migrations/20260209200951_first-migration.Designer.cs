@@ -11,7 +11,7 @@ using backend;
 namespace backend.Migrations
 {
     [DbContext(typeof(TeacherDbContext))]
-    [Migration("20260206131713_first-migration")]
+    [Migration("20260209200951_first-migration")]
     partial class firstmigration
     {
         /// <inheritdoc />
@@ -74,9 +74,6 @@ namespace backend.Migrations
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

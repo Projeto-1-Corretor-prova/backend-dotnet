@@ -12,7 +12,7 @@ public class QuestionTestWrittenController(TeacherDbContext context, IMapper map
 
     [HttpPost]
     [Route(Routes.QuestionTestWrittenCreateUrl)]
-    public async Task<IActionResult> Post(
+    public async Task<ActionResult<QuestionTestWrittenDto>> Post(
         [FromRoute] int questionId,
         [FromRoute] int testWrittenId,
         [FromBody] QuestionTestWrittenCreateDto questionTestWrittenCreateDto)
@@ -31,7 +31,7 @@ public class QuestionTestWrittenController(TeacherDbContext context, IMapper map
 
     [HttpPut]
     [Route(Routes.QuestionTestWrittenByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<QuestionTestWrittenDto>> Put(
         [FromRoute] int id,
         [FromBody] QuestionTestWrittenUpdateDto questionTestWrittenUpdateDto)
     {

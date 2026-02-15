@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.dtos.question;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,10 @@ namespace backend.controllers;
 [ApiController]
 public class QuestionController(TeacherDbContext context, IMapper mapper) : ControllerBase
 {
-        [backend.attributes.Authorize]
+        [Authorize]
         [HttpGet]
         [Route(Routes.QuestionByIdUrl)]
-        public async Task<IActionResult> Get([FromRoute] int id)
+        public async Task<ActionResult<QuestionDto>> Get([FromRoute] int id)
         {
             var question = await context
                 .Questions
@@ -27,10 +28,10 @@ public class QuestionController(TeacherDbContext context, IMapper mapper) : Cont
             return new OkObjectResult(mapper.Map<QuestionDto>(question));
         }
 
-        [backend.attributes.Authorize]
+        [Authorize]
         [HttpPost]
         [Route(Routes.QuestionCreateUrl)]
-        public async Task<IActionResult> Post(
+        public async Task<ActionResult<QuestionDto>> Post(
             [FromRoute] int questionBankId,
             [FromBody] QuestionCreateDto questionCreateDto)
         {
@@ -43,10 +44,10 @@ public class QuestionController(TeacherDbContext context, IMapper mapper) : Cont
             return new OkObjectResult(mapper.Map<QuestionDto>(createdQuestion));
         }
 
-        [backend.attributes.Authorize]
+        [Authorize]
         [HttpPut]
         [Route(Routes.QuestionByIdUrl)]
-        public async Task<IActionResult> Put(
+        public async Task<ActionResult<QuestionDto>> Put(
             [FromRoute] int id,
             [FromBody] QuestionUpdateDto questionUpdateDto)
         {

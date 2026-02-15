@@ -6,5 +6,5 @@ namespace backend.dtos.teacherClass;
 public record TeacherClassDto(
     int Id,
     string Title,
-    List<TestWrittenMiniDto> Tests,
+    List<TestWrittenMiniDto> TestWrittens,
     List<StudentMiniDto> Students);

@@ -1,6 +1,6 @@
 using AutoMapper;
-using backend.attributes;
 using backend.dtos.correction;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +13,7 @@ public class CorrectionController(TeacherDbContext context, IMapper mapper) : Co
     [Authorize]
     [HttpGet]
     [Route(Routes.CorrectionByIdUrl)]
-    public async Task<IActionResult> Get([FromRoute] int id)
+    public async Task<ActionResult<CorrectionDto>> Get([FromRoute] int id)
     {
         var correction = await context
             .Corrections

@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.dtos.student;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,10 @@ namespace backend.controllers;
 [ApiController]
 public class StudentController(TeacherDbContext teacherDbContext, IMapper mapper) : ControllerBase
 {
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPost]
     [Route(Routes.StudentCreateUrl)]
-    public async Task<IActionResult> Post(
+    public async Task<ActionResult<StudentDto>> Post(
         [FromRoute] int id,
         [FromBody] StudentCreateDto studentCreateDto)
     {
@@ -25,10 +26,10 @@ public class StudentController(TeacherDbContext teacherDbContext, IMapper mapper
         return new OkObjectResult(mapper.Map<StudentDto>(createdStudent));
     }
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPut]
     [Route(Routes.StudentByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<StudentDto>> Put(
         [FromRoute] int id,
         [FromBody] StudentUpdateDto studentUpdateDto)
     {
@@ -46,10 +47,10 @@ public class StudentController(TeacherDbContext teacherDbContext, IMapper mapper
         return new OkObjectResult(mapper.Map<StudentDto>(updatedStudent));
     }
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpGet]
     [Route(Routes.StudentByIdUrl)]
-    public async Task<IActionResult> Get(
+    public async Task<ActionResult<StudentDto>> Get(
         [FromRoute] int id)
     {
         var student = await teacherDbContext.Students

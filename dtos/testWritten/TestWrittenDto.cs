@@ -7,7 +7,7 @@ public record TestWrittenDto(
     int Id,
     string Title,
     string RegexQuestionIdentifier,
-    double Weight,
-    List<QuestionTestWrittenDto> Questions,
+    double TotalWeight,
+    List<QuestionTestWrittenDto> QuestionTestWrittens,
     List<CorrectionMiniDto> Corrections
     );

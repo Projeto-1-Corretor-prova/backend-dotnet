@@ -1,7 +1,7 @@
 using AutoMapper;
-using backend.attributes;
 using backend.dtos.comment;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.controllers;
@@ -13,7 +13,7 @@ public class CommentController(TeacherDbContext context, IMapper mapper) : Contr
     [Authorize]
     [HttpPost]
     [Route(Routes.CommentCreateUrl)]
-    public async Task<IActionResult> Post(
+    public async Task<ActionResult<CommentDto>> Post(
         [FromRoute] int answerId,
         [FromBody] CommentCreateDto commentCreateDto)
     {
@@ -27,7 +27,7 @@ public class CommentController(TeacherDbContext context, IMapper mapper) : Contr
     [Authorize]
     [HttpPut]
     [Route(Routes.CommentByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<CommentDto>> Put(
         [FromRoute] int commentId,
         [FromBody] CommentUpdateDto commentUpdateDto)
     {

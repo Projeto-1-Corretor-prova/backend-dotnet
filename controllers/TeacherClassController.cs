@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.dtos.teacherClass;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,31 +11,34 @@ namespace backend.controllers;
 public class TeacherClassController(TeacherDbContext context, IMapper mapper) : ControllerBase
 {
     
-    [backend.attributes.Authorize]
     [HttpPost]
     [Route(Routes.BaseTeacherClassUrl)]
-    public async Task<IActionResult> Post(
+    [Authorize]
+    public async Task<ActionResult<TeacherClassDto>> Post(
         [FromBody] TeacherClassCreateDto teacherClassCreateDto)
     {
-        var teacherId = (int?) HttpContext.Items["TeacherId"];
+                
+        if (!this.TryGetUserIdFromToken(out int teacherId))
+        {
+            return Unauthorized(new { message = "Invalid token" });
+        }
         var teacher = await context.Teachers.FindAsync(teacherId);
         if (teacher == null) return new NotFoundResult();
         var teacherClass = mapper.Map<TeacherClass>(teacherClassCreateDto);
-        teacherClass.TeacherId = teacherId!.Value;
+        teacherClass.TeacherId = teacherId;
         var createdTeacherClass = context.TeacherClasses.Add(teacherClass).Entity;
         await context.SaveChangesAsync();
         return new OkObjectResult(mapper.Map<TeacherClassDto>(createdTeacherClass));
     }
     
-    [backend.attributes.Authorize]
     [HttpPut(Routes.TeacherClassByIdUrl)]
-    public async Task<IActionResult> Put(
+    [Authorize]
+    public async Task<ActionResult<TeacherClassDto>> Put(
         [FromRoute] int id,
         [FromBody] TeacherClassUpdateDto teacherClassUpdateDto)
     {
         var teacherClass = await context
             .TeacherClasses
-            .AsNoTracking()
             .AsQueryable()
             .Where(tc => tc.Id == id)
             .Include(tc => tc.Students)
@@ -47,9 +51,9 @@ public class TeacherClassController(TeacherDbContext context, IMapper mapper) : 
         return new OkObjectResult(mapper.Map<TeacherClassDto>(teacherClass));
     }
     
-     [backend.attributes.Authorize]
      [HttpGet(Routes.TeacherClassByIdUrl)]
-     public async Task<IActionResult> Get(
+     [Authorize]
+     public async Task<ActionResult<TeacherClassDto>> Get(
          [FromRoute] int id)
      {
          var teacherClass = await context.TeacherClasses

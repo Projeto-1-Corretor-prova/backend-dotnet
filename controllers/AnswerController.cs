@@ -1,7 +1,7 @@
 using AutoMapper;
-using backend.attributes;
 using backend.dtos.answer;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +14,7 @@ public class AnswerController(TeacherDbContext context, IMapper mapper) : Contro
     [Authorize]
     [HttpPut]
     [Route(Routes.AnswerByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<AnswerDto>> Put(
         [FromRoute] int id,
         [FromBody] AnswerUpdateDto answerUpdatedto)
     {
@@ -23,7 +23,7 @@ public class AnswerController(TeacherDbContext context, IMapper mapper) : Contro
             .Include(a => a.AiComments)
             .Include(a => a.TeacherComments)
             .FirstOrDefaultAsync();
-            
+
         if (answer == null)
             return new NotFoundResult();
         

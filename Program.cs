@@ -1,10 +1,8 @@
 using backend;
-using backend.middleware;
+using backend.models;
 using backend.services;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +22,22 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Add Controllers
 builder.Services.AddControllers();
 
+builder.Services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "backend-api",
+        ValidAudience = builder.Configuration["JwtSettings:Audience"] ?? "backend-client",
+        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not found in configuration."))
+        )
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -36,30 +50,11 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT",
         Scheme = "bearer"
     });
-});
 
-// Configure JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not found in configuration.");
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+    c.AddSecurityRequirement(c => new OpenApiSecurityRequirement()
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"],
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
+        [new OpenApiSecuritySchemeReference("Bearer", c)] = []
+    });
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -77,18 +72,37 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-// Use JWT Middleware
-app.UseMiddleware<JwtMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 app.MapControllers();
+
 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<TeacherDbContext>();
     dbContext.Database.Migrate();
+    var teachers = dbContext.Teachers.ToAsyncEnumerable();
+    Console.WriteLine("Checking for existing teachers...");
+    var teacher = await teachers.FirstOrDefaultAsync();
+    if (teacher == null)
+    {
+        Console.WriteLine("No teachers found. Seeding default teacher...");
+        dbContext.Teachers.Add(new Teacher()
+        {
+            Id = 0,
+            Name = "Projeto-I-Token",
+            Email = "projeto1@gmail.com",
+            Password = new AuthService().HashPassword(builder.Configuration["Migrate_Default_Passwords"] ?? "admin123")
+        });
+        dbContext.SaveChanges();
+    }
+    else
+    {
+        Console.WriteLine("Teachers already exist. Skipping seeding.");
+    }
 }
 
 app.Run();

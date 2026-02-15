@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.dtos.questionCriteria;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.controllers;
@@ -9,10 +10,10 @@ namespace backend.controllers;
 public class QuestionCriteriaController(TeacherDbContext teacherDbContext, IMapper mapper) : ControllerBase
 {
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPost]
     [Route(Routes.QuestionCriteriaCreateUrl)]
-    public async Task<IActionResult> Post(
+    public async Task<ActionResult<QuestionCriteriaDto>> Post(
         [FromRoute] int questionId,
         [FromBody] QuestionCriteriaCreateDto questionCriteriaCreateDto)
     {
@@ -25,10 +26,10 @@ public class QuestionCriteriaController(TeacherDbContext teacherDbContext, IMapp
         return new OkObjectResult(mapper.Map<QuestionCriteriaDto>(createdQuestionCriteria));
     }
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPut]
     [Route(Routes.QuestionCriteriaByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<QuestionCriteriaDto>> Put(
         [FromRoute] int id,
         [FromBody] QuestionCriteriaUpdateDto questionCriteriaUpdateDto)
     {

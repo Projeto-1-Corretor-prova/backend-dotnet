@@ -2,6 +2,7 @@ using AutoMapper;
 using backend.dtos.questionBank;
 using backend.dtos.questionCriteria;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,24 +11,28 @@ namespace backend.controllers;
 [ApiController]
 public class QuestionBankController(TeacherDbContext context, IMapper mapper) : ControllerBase
 {
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPost]
     [Route(Routes.BaseQuestionBankUrl)]
-    public async Task<IActionResult> Post(
+    public async Task<ActionResult<QuestionBankDto>> Post(
         [FromBody] QuestionBankCreateDto questionBankCreateDto)
     {
-        var teacherId = (int?) HttpContext.Items["TeacherId"];
+                
+        if (!this.TryGetUserIdFromToken(out int teacherId))
+        {
+            return Unauthorized(new { message = "Invalid token" });
+        }
         var questionBank = mapper.Map<QuestionBank>(questionBankCreateDto);
-        questionBank.TeacherId = teacherId!.Value;
+        questionBank.TeacherId = teacherId;
         var createdQuestionBank = context.QuestionBanks.Add(questionBank).Entity;
         await context.SaveChangesAsync();
         return new OkObjectResult(mapper.Map<QuestionBankDto>(createdQuestionBank));
     }
 
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpPut]
     [Route(Routes.QuestionBankByIdUrl)]
-    public async Task<IActionResult> Put(
+    public async Task<ActionResult<QuestionBankDto>> Put(
         [FromRoute] int id,
         [FromBody] QuestionBankUpdateDto questionBankUpdateDto)
     {
@@ -44,10 +49,10 @@ public class QuestionBankController(TeacherDbContext context, IMapper mapper) : 
         return new OkObjectResult(mapper.Map<QuestionBankDto>(questionBank));
     }
     
-    [backend.attributes.Authorize]
+    [Authorize]
     [HttpGet]
     [Route(Routes.QuestionBankByIdUrl)]
-    public async Task<IActionResult> Get(
+    public async Task<ActionResult<QuestionBankDto>> Get(
         [FromRoute] int id)
     {
         var questionBank = await context.QuestionBanks

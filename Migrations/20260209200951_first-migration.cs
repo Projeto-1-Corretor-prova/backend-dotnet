@@ -238,7 +238,6 @@ namespace backend.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Content = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
                     AnswerAiId = table.Column<int>(type: "integer", nullable: true),
                     AnswerTeacherId = table.Column<int>(type: "integer", nullable: true)
                 },

@@ -8,6 +8,6 @@ public record AnswerDto(
     int Id,
     string StudentAnswer,
     double Score,
-    QuestionTestWrittenDto Question,
+    QuestionTestWrittenDto QuestionTestWritten,
     List<CommentDto> AIComments,
     List<CommentDto> TeacherComments);
