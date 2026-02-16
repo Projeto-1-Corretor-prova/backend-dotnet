@@ -66,4 +66,16 @@ public class TestWrittenController(TeacherDbContext teacherDbContext, IMapper ma
         if (testWritten == null) return new NotFoundResult();
         return new OkObjectResult(mapper.Map<TestWrittenDto>(testWritten));
     }
+    
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.TestWrittenByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var testWritten = await teacherDbContext.TestWrittens.FindAsync(id);
+        if (testWritten == null) return new NotFoundResult();
+        teacherDbContext.TestWrittens.Remove(testWritten);
+        await teacherDbContext.SaveChangesAsync();
+        return new NoContentResult();
+    }
 }

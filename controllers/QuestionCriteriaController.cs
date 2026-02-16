@@ -41,4 +41,16 @@ public class QuestionCriteriaController(TeacherDbContext teacherDbContext, IMapp
         return new OkObjectResult(mapper.Map<QuestionCriteriaDto>(updatedQuestionCriteria));
     }
     
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.QuestionCriteriaByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var questionCriteria = await teacherDbContext.QuestionCriterias.FindAsync(id);
+        if (questionCriteria == null) return new NotFoundResult();
+        teacherDbContext.QuestionCriterias.Remove(questionCriteria);
+        await teacherDbContext.SaveChangesAsync();
+        return new NoContentResult();
+    }
+    
 }

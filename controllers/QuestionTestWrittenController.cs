@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.dtos.questionTestWritten;
 using backend.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace backend.controllers;
 public class QuestionTestWrittenController(TeacherDbContext context, IMapper mapper) : ControllerBase
 {
 
+    [Authorize]
     [HttpPost]
     [Route(Routes.QuestionTestWrittenCreateUrl)]
     public async Task<ActionResult<QuestionTestWrittenDto>> Post(
@@ -28,7 +30,8 @@ public class QuestionTestWrittenController(TeacherDbContext context, IMapper map
         await context.SaveChangesAsync();
         return new OkObjectResult(mapper.Map<QuestionTestWrittenDto>(createdQuestionTestWritten));
     }
-
+    
+    [Authorize]
     [HttpPut]
     [Route(Routes.QuestionTestWrittenByIdUrl)]
     public async Task<ActionResult<QuestionTestWrittenDto>> Put(
@@ -48,6 +51,18 @@ public class QuestionTestWrittenController(TeacherDbContext context, IMapper map
         updatedQuestionTestWritten = context.QuestionTestWrittens.Update(updatedQuestionTestWritten).Entity;
         await context.SaveChangesAsync();
         return new OkObjectResult(mapper.Map<QuestionTestWrittenDto>(updatedQuestionTestWritten));
+    }
+    
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.QuestionTestWrittenByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var questionTestWritten = await context.QuestionTestWrittens.FindAsync(id);
+        if (questionTestWritten == null) return new NotFoundResult();
+        context.QuestionTestWrittens.Remove(questionTestWritten);
+        await context.SaveChangesAsync();
+        return new NoContentResult();
     }
 
 }

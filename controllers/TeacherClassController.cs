@@ -68,4 +68,16 @@ public class TeacherClassController(TeacherDbContext context, IMapper mapper) : 
          if (teacherClass == null) return new NotFoundResult();
          return new OkObjectResult(mapper.Map<TeacherClassDto>(teacherClass));
      }
+
+     [Authorize]
+     [HttpDelete]
+     [Route(Routes.TeacherClassByIdUrl)]
+     public async Task<IActionResult> Delete([FromRoute] int id)
+     {
+         var teacherClass = await context.TeacherClasses.FindAsync(id);
+         if (teacherClass == null) return new NotFoundResult();
+         context.TeacherClasses.Remove(teacherClass);
+         await context.SaveChangesAsync();
+         return new NoContentResult();
+     }
 }

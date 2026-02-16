@@ -38,5 +38,18 @@ public class CorrectionController(TeacherDbContext context, IMapper mapper) : Co
         
         return new OkObjectResult(correctionDto);
     }
-    
+
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.CorrectionByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var correction = await context.Corrections.FindAsync(id);
+        if (correction == null)
+            return new NotFoundResult();
+        context.Corrections.Remove(correction);
+        await context.SaveChangesAsync();
+        return new NoContentResult();
+    }
+
 }

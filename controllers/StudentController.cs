@@ -63,4 +63,16 @@ public class StudentController(TeacherDbContext teacherDbContext, IMapper mapper
         if (student == null) return new NotFoundResult();
         return new OkObjectResult(mapper.Map<StudentDto>(student));
     }
+
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.StudentByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var student = await teacherDbContext.Students.FindAsync(id);
+        if (student == null) return new NotFoundResult();
+        teacherDbContext.Students.Remove(student);
+        await teacherDbContext.SaveChangesAsync();
+        return new NoContentResult();
+    }
 }

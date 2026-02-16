@@ -65,4 +65,17 @@ public class QuestionBankController(TeacherDbContext context, IMapper mapper) : 
         return new OkObjectResult(mapper.Map<QuestionBankDto>(questionBank));
     }
 
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.QuestionBankByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var questionBank = await context.QuestionBanks.FindAsync(id);
+        if (questionBank == null)
+            return new NotFoundResult();
+        context.QuestionBanks.Remove(questionBank);
+        await context.SaveChangesAsync();
+        return new NoContentResult();
+    }
+    
 }

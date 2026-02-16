@@ -138,12 +138,14 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<Teacher>()
             .HasMany(t => t.TeacherClasses)
             .WithOne(t => t.Teacher)
-            .HasForeignKey(t => t.TeacherId);
+            .HasForeignKey(t => t.TeacherId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<Teacher>()
             .HasMany(t => t.QuestionBanks)
             .WithOne(q => q.Teacher)
-            .HasForeignKey(q => q.TeacherId);
+            .HasForeignKey(q => q.TeacherId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void TeacherClassCreating(ModelBuilder modelBuilder)
@@ -151,12 +153,14 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<TeacherClass>()
             .HasMany(tc => tc.TestWrittens)
             .WithOne(tw => tw.TeacherClass)
-            .HasForeignKey(tc => tc.TeacherClassId);
+            .HasForeignKey(tc => tc.TeacherClassId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<TeacherClass>()
             .HasMany(tc => tc.Students)
             .WithOne(st => st.TeacherClass)
-            .HasForeignKey(st => st.TeacherClassId);
+            .HasForeignKey(st => st.TeacherClassId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void TestWrittenCreating(ModelBuilder modelBuilder)
@@ -169,12 +173,14 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<TestWritten>()
             .HasMany(tw => tw.Corrections)
             .WithOne(c => c.TestWritten)
-            .HasForeignKey(c => c.TestWrittenId);
+            .HasForeignKey(c => c.TestWrittenId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<TestWritten>()
             .HasMany(tw => tw.QuestionTestWrittens)
             .WithOne(qtw => qtw.TestWritten)
-            .HasForeignKey(qtw => qtw.TestWrittenId);
+            .HasForeignKey(qtw => qtw.TestWrittenId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void AnswerCreating(ModelBuilder modelBuilder)
@@ -192,12 +198,14 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<Answer>()
             .HasMany(a => a.AiComments)
             .WithOne(c => c.AnswerAi)
-            .HasForeignKey(c => c.AnswerAiId);
+            .HasForeignKey(c => c.AnswerAiId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<Answer>()
             .HasMany(a => a.TeacherComments)
             .WithOne(c => c.AnswerTeacher)
-            .HasForeignKey(a => a.AnswerTeacherId);
+            .HasForeignKey(a => a.AnswerTeacherId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void QuestionCreating(ModelBuilder modelBuilder)
@@ -210,12 +218,14 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<Question>()
             .HasMany(q => q.QuestionCriterias)
             .WithOne(qc => qc.Question)
-            .HasForeignKey(qc => qc.QuestionId);
+            .HasForeignKey(qc => qc.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<Question>()
             .HasMany(q => q.QuestionTestWrittens)
             .WithOne(qtw => qtw.Question)
-            .HasForeignKey(qtw => qtw.QuestionId);
+            .HasForeignKey(qtw => qtw.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private void QuestionBankCreating(ModelBuilder modelBuilder)
@@ -228,7 +238,8 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<QuestionBank>()
             .HasMany(qb => qb.Questions)
             .WithOne(q => q.QuestionBank)
-            .HasForeignKey(q => q.QuestionBankId);
+            .HasForeignKey(q => q.QuestionBankId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void QuestionCriteriaCreating(ModelBuilder modelBuilder)
@@ -249,7 +260,8 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<QuestionTestWritten>()
             .HasMany(qtw => qtw.Answers)
             .WithOne(a => a.QuestionTestWritten)
-            .HasForeignKey(a => a.QuestionTestWrittenId);
+            .HasForeignKey(a => a.QuestionTestWrittenId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<QuestionTestWritten>()
             .HasOne(qtw => qtw.Question)
@@ -267,7 +279,8 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<Student>()
             .HasMany(s => s.Corrections)
             .WithOne(c => c.Student)
-            .HasForeignKey(t => t.StudentId);
+            .HasForeignKey(t => t.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void CorrectionCreating(ModelBuilder modelBuilder)
@@ -285,7 +298,8 @@ public class TeacherDbContext : DbContext
         modelBuilder.Entity<Correction>()
             .HasMany(c => c.Answers)
             .WithOne(a => a.Correction)
-            .HasForeignKey(a => a.CorrectionId);
+            .HasForeignKey(a => a.CorrectionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void CommentCreating(ModelBuilder modelBuilder)

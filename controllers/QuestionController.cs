@@ -64,4 +64,16 @@ public class QuestionController(TeacherDbContext context, IMapper mapper) : Cont
             await context.SaveChangesAsync();
             return new OkObjectResult(mapper.Map<QuestionDto>(question));
         }
+
+        [Authorize]
+        [HttpDelete]
+        [Route(Routes.QuestionByIdUrl)]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var question = await context.Questions.FindAsync(id);
+            if (question == null) return new NotFoundResult();
+            context.Questions.Remove(question);
+            await context.SaveChangesAsync();
+            return new NoContentResult();
+        }
 }

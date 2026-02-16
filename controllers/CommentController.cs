@@ -39,5 +39,18 @@ public class CommentController(TeacherDbContext context, IMapper mapper) : Contr
         await context.SaveChangesAsync();
         return new OkObjectResult(mapper.Map<Comment, CommentDto>(comment));
     }
-    
+
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.CommentByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int commentId)
+    {
+        var comment = await context.Comments.FindAsync(commentId);
+        if (comment == null)
+            return new NotFoundResult();
+        context.Comments.Remove(comment);
+        await context.SaveChangesAsync();
+        return new NoContentResult();
+    }
+
 }

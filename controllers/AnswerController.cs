@@ -34,5 +34,17 @@ public class AnswerController(TeacherDbContext context, IMapper mapper) : Contro
         
         return new OkObjectResult(mapper.Map<Answer, AnswerDto>(answer));
     }
-    
+
+    [Authorize]
+    [HttpDelete]
+    [Route(Routes.AnswerByIdUrl)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var answer = await context.Answers.FindAsync(id);
+        if (answer == null)
+            return new NotFoundResult();
+        context.Answers.Remove(answer);
+        await context.SaveChangesAsync();
+        return new NoContentResult();
+    }
 }
